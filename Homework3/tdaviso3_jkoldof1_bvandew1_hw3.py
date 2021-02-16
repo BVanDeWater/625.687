@@ -12,6 +12,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from itertools import combinations
 
+from AbstractSimplicialComplex import AbstractSimplicialComplex
+
 ########
 # MAIN #
 ########
@@ -26,6 +28,14 @@ def main():
 
     print(f"Human-readable representation of complex A: {A.edges()}")
     print(f"Human-readable representation of complex B: {B.edges()}")
+
+    vectorsA, mappingA = build_custom_complex(datasetA)
+    vectorsB, mappingB = build_custom_complex(datasetB)
+
+    print("\nVectorized representation of dataset A:")
+    print("Point indices:", mappingA)
+    for i in range(0, len(datasetA)):
+        print(vectorsA[i], "=", datasetA[i])
 
     # Problem 2
 
@@ -44,6 +54,11 @@ def build_simple_graph(cmplx):
             G.add_edge(nodes[0], nodes[1])
 
     return G
+
+def build_custom_complex(cmplx):
+    asc = AbstractSimplicialComplex()
+    vectors, mapping = asc.one_hot(cmplx)
+    return vectors, mapping
 
 #######
 # RUN #
