@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 """
-Tim Davison, Jeff Koldoff, Ben Van De Water
+Tim Davison, Ben Van De Water
 625.687 - Applied Topology
 Coding Homework 1
 """
