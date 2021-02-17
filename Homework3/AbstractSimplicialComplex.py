@@ -37,3 +37,21 @@ class AbstractSimplicialComplex:
 
 
 
+import networkx as nx
+from itertools import combinations
+
+class NXSimplicialComplex(nx.Graph):
+
+    def add_surface(self, nodes, **attr):
+        # add nodes and edges
+        for nodes in combinations(nodes, 2):
+            self.add_edge(nodes[0], nodes[1])
+
+        # add surface (3 dimensional)
+        for n in nodes:
+            others = [m for m in nodes if m != n]
+            datadict = {}
+            for m in others:
+                datadict[m] = self._adj[n].get(m, self.edge_attr_dict_factory())
+                datadict.update(attr)
+            self._adj[n][others] = datadict

@@ -12,7 +12,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from itertools import combinations
 
-from AbstractSimplicialComplex import AbstractSimplicialComplex
+from AbstractSimplicialComplex import AbstractSimplicialComplex, NXSimplicialComplex
 
 ########
 # MAIN #
@@ -23,11 +23,11 @@ def main():
     datasetA = smplcs_to_cmplx(string_to_smplcs(stringA))
     datasetB = smplcs_to_cmplx(string_to_smplcs(stringB))
 
-    A = build_simple_graph(datasetA)
-    B = build_simple_graph(datasetB)
+    A = build_nx_complex(datasetA)
+    B = build_nx_complex(datasetB)
 
-    print(f"Human-readable representation of complex A: {A.edges()}")
-    print(f"Human-readable representation of complex B: {B.edges()}")
+    print(f"Human-readable representation of complex A: {A._adj}")
+    print(f"Human-readable representation of complex B: {B._adj}")
 
     vectorsA, mappingA = build_custom_complex(datasetA)
     vectorsB, mappingB = build_custom_complex(datasetB)
@@ -45,13 +45,15 @@ def main():
 # FUNCTIONS #
 #############
 
-def build_simple_graph(cmplx):
-    G = nx.Graph()
+def build_nx_complex(cmplx):
+    G = NXSimplicialComplex()
     for smplx in cmplx:
-        #dim = len(simplex) - 1
-        # Probably not optimal, NX.Graph has a method to create edges from a list.
-        for nodes in combinations(smplx, 2):
-            G.add_edge(nodes[0], nodes[1])
+        dim = len(smplx) - 1
+        # Not elegant
+        if dim == 2:
+            G.add_edge(smplx[0], smplx[1])
+        elif dim == 3:
+            G.add_surface([smplx[0], smplx[1], smplx[2]])
 
     return G
 
