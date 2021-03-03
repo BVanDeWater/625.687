@@ -35,6 +35,14 @@ class AbstractSimplicialComplex:
             data_vectors.append(vector)
         return data_vectors, point_mapping
 
+    def compute_pchains_from_node(self, data):
+        """
+
+
+        :param data:
+        :return:
+        """
+        for
 
 
 import networkx as nx
