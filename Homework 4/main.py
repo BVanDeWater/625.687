@@ -9,6 +9,7 @@ if __name__ == "__main__":
     vectorsA, mappingA = utils.build_custom_complex(datasetA)
     vectorsB, mappingB = utils.build_custom_complex(datasetB)
 
+    '''
     # Generating all possible combinations of pairs/ triples mod 2 for dataset A
     dim2_boundariesA = utils.compute_pchain_boundaries(vectorsA, 2)
     dim3_boundariesA = utils.compute_pchain_boundaries(vectorsA, 3)
@@ -29,4 +30,20 @@ if __name__ == "__main__":
         "Dataset B: generated {} unique elements from {} boundary pairs"
         .format(len(dim2_boundariesB), num_pairsB))
     print("Dataset G: generated {} unique elements from {} boundary triplets"
-          .format(len(dim3_boundariesB), num_triplesB))
+        .format(len(dim3_boundariesB), num_triplesB))
+    '''
+
+    # Boundary matrices
+    reverse_mappingA = {v:k for k,v in mappingA.items()}
+    boundary_mapA_d1 = utils.generate_boundary_map(vectorsA, dim=1, mapping=reverse_mappingA)
+    boundary_mapA_d2 = utils.generate_boundary_map(vectorsA, dim=2, mapping=reverse_mappingA)
+
+    reverse_mappingB = {v: k for k, v in mappingA.items()}
+    boundary_mapB_d1 = utils.generate_boundary_map(vectorsB, dim=1, mapping=reverse_mappingB)
+    Bboundary_mapB_d2 = utils.generate_boundary_map(vectorsB, dim=2, mapping=reverse_mappingB)
+
+    print("Sample boundary map matrix - dataset A, triples -> edges")
+    print(boundary_mapA_d1)
+
+    print("Sample boundary map matrix - dataset A, edges -> points")
+    print(boundary_mapA_d2)

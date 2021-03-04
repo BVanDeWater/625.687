@@ -36,7 +36,6 @@ class AbstractSimplicialComplex:
         return data_vectors, point_mapping
 
 
-
 import networkx as nx
 from itertools import combinations
 

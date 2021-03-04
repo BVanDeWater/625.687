@@ -3,6 +3,7 @@
 ###########
 from itertools import combinations
 import numpy as np
+import pandas as pd
 
 from .AbstractSimplicialComplex import AbstractSimplicialComplex
 
@@ -66,3 +67,35 @@ def compute_pchain_boundaries(data, starting_dim=2):
         for combo in i_length_combos:
             image.add(tuple(mod2_n_vector_addition(combo)))
     return image
+
+
+def generate_boundary_map(data, dim=2, mapping=None):  # mapping not actually optional at this time
+    points = [x for x in data if sum(x) == dim]  # assumes one-hot encoding
+    edges = [x for x in data if sum(x) == dim+1]
+    index = mapping.values()
+
+    if dim == 1:
+        points = index
+
+    # Generate human-readable columns for {{dim}}-simplices
+    cols = []
+    for x in edges:
+        edge = []
+        for i in range(len(edges[0])):
+            if x[i] == 1:
+                edge.append(mapping[i])
+        cols.append(tuple(edge))
+
+    # Generate rows for each point
+    df = []
+    for x in index:
+        row = []
+        for col in cols:
+            if x in col:
+                row.append(1)
+            else:
+                row.append(0)
+        df.append(row)
+
+    df = pd.DataFrame(df, columns=cols, index=index)
+    return df
