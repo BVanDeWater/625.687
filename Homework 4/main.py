@@ -1,4 +1,4 @@
-from src import AbstractSimplicialComplex, dataset_hw3, utils
+from src import dataset_hw3, utils
 
 
 if __name__ == "__main__":
