@@ -1,11 +1,11 @@
-from src import dataset_hw3, utils
+from src import dataset, utils
 
 
 if __name__ == "__main__":
 
     # Initializing our data
-    datasetA = utils.smplcs_to_cmplx(utils.string_to_smplcs(dataset_hw3.stringA))
-    datasetB = utils.smplcs_to_cmplx(utils.string_to_smplcs(dataset_hw3.stringB))
+    datasetA = utils.smplcs_to_cmplx(utils.string_to_smplcs(dataset.stringA))
+    datasetB = utils.smplcs_to_cmplx(utils.string_to_smplcs(dataset.stringB))
     vectorsA, mappingA = utils.build_custom_complex(datasetA)
     vectorsB, mappingB = utils.build_custom_complex(datasetB)
 
