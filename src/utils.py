@@ -76,26 +76,45 @@ def generate_boundary_map(data, dim=2, mapping=None):  # mapping not actually op
 
     if dim == 1:
         points = index
+    else:
+        rows = []
+        for x in points:
+            row = []
+            for i in range(len(index)):
+                if x[i] == 1:
+                    row.append(mapping[i])
+            rows.append(tuple(row))
+        points = rows
 
     # Generate human-readable columns for {{dim}}-simplices
     cols = []
     for x in edges:
         edge = []
-        for i in range(len(edges[0])):
+        for i in range(len(index)):
             if x[i] == 1:
                 edge.append(mapping[i])
         cols.append(tuple(edge))
 
     # Generate rows for each point
     df = []
-    for x in index:
-        row = []
-        for col in cols:
-            if x in col:
-                row.append(1)
-            else:
-                row.append(0)
-        df.append(row)
-
-    df = pd.DataFrame(df, columns=cols, index=index)
+    if dim == 1:
+        for x in index:
+            row = []
+            for col in cols:
+                if x in col:
+                    row.append(1)
+                else:
+                    row.append(0)
+            df.append(row)
+    else:
+        for point in points:
+            row = []
+            for col in cols:
+                point_is_boundary = True
+                for i in range(len(point)):
+                    if point[i] not in col:
+                        point_is_boundary = False
+                row.append(int(point_is_boundary))
+            df.append(row)
+    df = pd.DataFrame(df, columns=cols, index=points)
     return df
