@@ -45,7 +45,7 @@ if __name__ == "__main__":
     boundary_mapB_d2 = utils.generate_boundary_map(vectorsB, dim=2, mapping=reverse_mappingB)
 
     print("Sample boundary map matrix - dataset A, triples -> edges")
-    print(boundary_mapA_d1)
+    print(boundary_mapA_d2)
 
     print("Sample boundary map matrix - dataset A, edges -> points")
-    print(boundary_mapA_d2)
+    print(boundary_mapA_d1)
