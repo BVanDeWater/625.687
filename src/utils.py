@@ -1,14 +1,16 @@
-###########
-# PARSERS #
-###########
+'''
+Additional utility and helper functions for using an Abstract Simplicial Complex for
+analysis.
+
+'''
+
 from itertools import combinations
 import numpy as np
 import pandas as pd
 
 from numpy.linalg import solve, matrix_rank
 
-from .AbstractSimplicialComplex import AbstractSimplicialComplex
-
+from AbstractSimplicialComplex import AbstractSimplicialComplex
 
 string_to_smplcs = lambda st: [smplx.replace("}", "") for smplx in st.split("}, ")]
 smplcs_to_cmplx  = lambda smplcs: [smplx.replace("{", "").replace(" ", "").split(',') for smplx in smplcs]

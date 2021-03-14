@@ -1,5 +1,10 @@
-from src import dataset, utils
+'''
+Test module that prints human readable output for a given assignment. Mutable 
+depending on assignment, though probably best to keep legacy functions.
 
+'''
+
+import dataset, utils
 
 if __name__ == "__main__":
 

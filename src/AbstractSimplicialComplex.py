@@ -1,5 +1,6 @@
 """
-Class intended to generalize simplicial complex structures
+Class intended to generalize simplicial complex structures.
+
 """
 
 
