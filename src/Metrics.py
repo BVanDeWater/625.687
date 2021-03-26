@@ -11,12 +11,7 @@ class Metric:
     def __init__(self):
         pass
 
-#################
-# CHILD CLASSES #
-#################
+    def L_2_norm(self, radius):
+        pass
 
-class L_2_norm(Metric):
-    pass
-
-class L_inf_norm(Metric):
-    pass
+    def L_inf_norm(self, radius):
