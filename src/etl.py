@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-IGNORE_FIELDS = []
+IGNORE_FIELDS = ['track7_digitalid', '']
 
 ########
 # MAIN #
@@ -31,8 +31,11 @@ def main(basedir, test):
         for f in files:
             #try:
             print(cnt)
-            data_list.append(pull_attrs_from_h5(f))
-            cnt += 1
+            try:
+                data_list.append(pull_attrs_from_h5(f))
+                cnt += 1
+            except:
+                continue
             if test and cnt > 100:
                 br = True
                 break
@@ -43,6 +46,7 @@ def main(basedir, test):
     print(agg_df)
 
     # Pickle the DataFrame?
+    agg_df.to_pickle(f'{basedir}/MillionSongSubset_dataframe.zip')
 
 
 #############
