@@ -4,16 +4,28 @@
 Module to pull the dataset into a SQLite database.
 
 """
-import os, sys
-import glob
+import argparse
 import h5py as h5
-import sqlite3 as sql
-
-import numpy as np
+import os
 import pandas as pd
-from tqdm import tqdm
+import pickle
+import glob
 
 IGNORE_FIELDS = ['track7_digitalid', '']
+
+
+def build_parser():
+    """
+    Dropping this at the top for legibility (reading args)
+    :return:
+    """
+    parser = argparse.ArgumentParser(description='ETL for the MillionSongDataset.')
+    parser.add_argument('-d', '--data_path', type=str, dest='data_path', action='store', required=True,
+                        help='path to the directory containing your (downloaded) dataset.')
+    parser.add_argument('-t', '--test', type=str, dest='test', action='store', required=True,
+                        help='path to the directory containing your (downloaded) dataset.')
+    return parser
+
 
 ########
 # MAIN #
@@ -27,9 +39,9 @@ def main(basedir, test):
     br = False
     cnt = 0
     for root, dirs, files in os.walk(basedir):
-        files = glob.glob(os.path.join(root,'*'+'.h5'))
+        files = glob.glob(os.path.join(root, '*' + '.h5'))
         for f in files:
-            #try:
+            # try:
             print(cnt)
             try:
                 data_list.append(pull_attrs_from_h5(f))
@@ -46,14 +58,20 @@ def main(basedir, test):
     print(agg_df)
 
     # Pickle the DataFrame?
-    agg_df.to_pickle(f'{basedir}/MillionSongSubset_dataframe.zip')
+    if test:
+        path = f'{basedir}MillionSongSubset_dataframe_test.pkl'
+    else:
+        path = f'{basedir}MillionSongSubset_dataframe.pkl'
+    with open(path, 'wb') as f:
+        pickle.dump(agg_df, f)
+    print(path)
 
 
 #############
 # FUNCTIONS #
 #############
 
-def apply_to_all_files(basedir,func=lambda x: x,ext='.h5'):
+def apply_to_all_files(basedir, func=lambda x: x, ext='.h5'):
     """
     ** Adapted from the MSD Python Tutorial **
 
@@ -71,13 +89,14 @@ def apply_to_all_files(basedir,func=lambda x: x,ext='.h5'):
     cnt = 0
     # iterate over all files in all subdirectories
     for root, dirs, files in os.walk(basedir):
-        files = glob.glob(os.path.join(root,'*'+ext))
+        files = glob.glob(os.path.join(root, '*' + ext))
         # count files
         cnt += len(files)
         # apply function to all files
         for f in files:
-            func(f)   
+            func(f)
     return cnt
+
 
 def pull_attrs_from_h5(f):
     file_attrs = {}
@@ -96,6 +115,7 @@ def process_group(grp, attrs):
             process_ds(grp[k], attrs)
     return attrs
 
+
 def process_ds(ds, attrs):
     if ds.dtype.names:
         for field in ds.dtype.names:
@@ -104,19 +124,16 @@ def process_ds(ds, attrs):
             attrs[field] = ds[field][0]
     return attrs
 
+
 #######
 # RUN #
 #######
 
 if __name__ == '__main__':
-    # Hacky argparsing, lol.
-    test = False
-    for token in ["-t", "--test", "t", "test"]:
-        if token in sys.argv:
-            test=True
-    if 'ben' in sys.argv or 'Ben' in sys.argv:
-        basedir = "/Volumes/T7/MillionSongSubset"
-    else:
-        basedir = "" # Your path here!
+    parser = build_parser()
+    args = parser.parse_args()
 
-    main(basedir, test)
+    data_path = args.data_path
+    test = False if args.test in ["False", "false"] else True
+
+    main(data_path, test)
