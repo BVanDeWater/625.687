@@ -37,10 +37,6 @@ if __name__ == "__main__":
     # the higher dimension). This is just taking all the cycles, then taking out those from boundaries. You may
     # have to deal with linear combinations somehow.
 
-    """
-    Tim's thoughts - I think we can use the 
-    """
-
     # TODO: Find the rank of the cycles, the rank of the boundaries, and therefore the rank of the homologies.
     # Compare the ranks with the actual numbers of things you computed in the previous steps.
 
