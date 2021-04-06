@@ -38,26 +38,26 @@ def main(basedir, test):
     # Walk through the hierarchy to gather paths for each h5 file.
     br = False
     cnt = 0
+    print()
     for root, dirs, files in os.walk(basedir):
         files = glob.glob(os.path.join(root, '*' + '.h5'))
         for f in files:
-            # try:
-            print(cnt)
+            print(f"\r\033[A{cnt}")
             try:
                 data_list.append(pull_attrs_from_h5(f))
                 cnt += 1
             except:
+                print(f"Error at {cnt}\n")
                 continue
-            if test and cnt > 100:
+            if test and cnt >= 100:
                 br = True
                 break
         if br:
             break
 
-    agg_df = pd.DataFrame(data_list)
-    print(agg_df)
 
-    # Pickle the DataFrame?
+    agg_df = pd.DataFrame(data_list)
+
     if test:
         path = f'{basedir}MillionSongSubset_dataframe_test.pkl'
     else:
@@ -104,15 +104,17 @@ def pull_attrs_from_h5(f):
     for i in f_h5.keys():
         if type(f_h5[i]) == h5._hl.group.Group:
             file_attrs = process_group(f_h5[i], file_attrs)
+        if type(f_h5[i]) == h5._hl.dataset.Dataset:
+            file_attrs = process_ds(f_h5[i], file_attrs)
     return file_attrs
 
 
 def process_group(grp, attrs):
     for k in grp.keys():
         if type(grp[k]) == h5._hl.group.Group:
-            process_grp(grp[k], attrs)
+            attrs = process_group(grp[k], attrs)
         elif type(grp[k]) == h5._hl.dataset.Dataset:
-            process_ds(grp[k], attrs)
+            attrs = process_ds(grp[k], attrs)
     return attrs
 
 
@@ -122,6 +124,13 @@ def process_ds(ds, attrs):
             if field in IGNORE_FIELDS:
                 continue
             attrs[field] = ds[field][0]
+    elif type(list(ds[()])) == h5._hl.dataset.Dataset:
+        attrs = process_ds(list(ds[()]), attrs)
+    else:
+        vals = []
+        for ele in ds:
+            vals.append(ele)
+        attrs[ds.name.split("/")[-1]] = vals
     return attrs
 
 
