@@ -6,9 +6,9 @@ analysis.
 
 from itertools import combinations
 import numpy as np
+from numpy.linalg import solve
 import pandas as pd
-
-from numpy.linalg import solve, matrix_rank
+from sympy import Matrix, mod_inverse
 
 from AbstractSimplicialComplex import AbstractSimplicialComplex
 
@@ -48,24 +48,10 @@ def mod2_n_vector_addition(data):
     Take a list of N vectors, compute their sum mod 2
 
     """
-    # Perhaps a little simpler? Doesn't break anything with the test case,
-    # though handling for len(data) < 2 is different.
     res = np.zeros(3)
     for v in data:
         res = mod2_vector_addition(res, v)
     return res
-    #data = np.asarray(data)
-    #for i in range(len(data)):
-    #    if not isinstance(data[i], np.ndarray):
-    #        data[i] = np.asarray(data[i])
-    #if len(data) < 2:
-    #    return []
-    #v1 = data[0]
-    #for i in range(1, len(data)):
-    #    v1 += data[i]
-    #mod_2 = [2]*len(v1)
-    #v2_mod_2 = np.mod(v1, mod_2)
-    #return v2_mod_2
 
 
 def compute_pchain_boundaries(data, starting_dim=2):
@@ -139,3 +125,31 @@ def compute_boundary_map_rank(df):
             boundary_map[r][c] = row
     boundary_mat = np.asmatrix(boundary_map)
     return solve(boundary_mat, np.ones(boundary_mat.shape[1]))
+
+
+def rref_mod_helper(x, modulus):
+    """
+    Helper function to clean up sympy reduce output
+    """
+    numerator, denominator = x.as_numer_denom()
+    return numerator * mod_inverse(denominator, modulus) % modulus
+
+
+def rref_mod_n(matrix, n=2):
+    """
+    ~ Borrowed ~ from https://stackoverflow.com/questions/31190182/sympy-solving-matrices-in-a-finite-field
+
+    Given a matrix and a modulus n (default n=2), row reduce mod n
+    """
+    # Move data into a sympy Matrix() object
+    if type(matrix) == pd.DataFrame:
+        matrix = matrix.values
+    try:
+        matrix = Matrix(matrix)
+    except Exception as e:
+        print("Failed to intialize data as a Sympy matrix: {}".format(e))
+
+    # Reduce mod n
+    matrix = matrix.rref(iszerofunc=lambda x: x % n == 0)  # can we trust sympy?
+    matrix = matrix[0].applyfunc(lambda x: rref_mod_helper(x, n))  # cleanup
+    return matrix
