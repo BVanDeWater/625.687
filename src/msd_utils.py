@@ -20,7 +20,8 @@ from scipy.stats import entropy  # new requirement; we should track these when w
 # that field (skipping those w/out that field, since can't really do cleaning on seriously empty series data), then
 # start to use metrics from Metrics.py to see how things map out
 
-# Feel free to delete these comments whenever you've read them
+# Feel free to delete these comments whenever you've read them. For explanation of the functions themselves
+# (and why I'm doing the weird things I'm doing) we should set up a call - much easier to explain by talking
 
 def vectorize_segments_pitches_distribution(pitches_vector):
     """
