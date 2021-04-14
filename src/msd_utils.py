@@ -104,4 +104,3 @@ def vectorize_segments_pitches(pitches_vector):
 
     return_vector = pitch_distribution + pitch_entropy
     return return_vector
-

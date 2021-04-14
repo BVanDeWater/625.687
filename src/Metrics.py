@@ -38,16 +38,19 @@ class Metric:
             linf += abs(x[i] - y[i])
         return max(linf)
 
-    def cosine_distance(self, x, y):
-        return pairwise.cosine_distance(x, y)
-
     def cosine_similarity(self, x, y):
-        return pairwise.cosine_similarity(x, y)
+        try:
+            return pairwise.cosine_similarity(x, y)
+        except Exception as e:
+            print("Formatting X, Y as numpy arrays...")
+            x = np.asarray(x).reshape(1, -1)
+            y = np.asarray(y).reshape(1, -1)
+            return pairwise.cosine_similarity(x, y)
 
     def dot_product(self, x, y):
         return np.dot(x, y)
 
-    
+
 
 sample_vector1 = [0, 0, 1, 2, 0.5, 0]
 sample_vector2 = [0, 1, 0, 2, 0.6, 0]
@@ -58,4 +61,4 @@ sample_matrix1 = [sample_vector1, sample_vector1]
 sample_matrix2 = [sample_vector3, sample_vector4]
 
 metric = Metric()
-print("L2 norm:", metric.L_2_norm(sample_vector1, sample_vector2))
+print("L2 norm:", metric.cosine_similarity(sample_vector1, sample_vector2))
