@@ -11,19 +11,28 @@ import pandas as pd
 import pickle
 import glob
 
-IGNORE_FIELDS = ['track7_digitalid', '']
-
+EXCLUDE_FIELDS = []
+#INCLUDE_FIELDS = []
 
 def build_parser():
     """
     Dropping this at the top for legibility (reading args)
     :return:
+
+    Usage: something like:
+
+        python3 etl.py -t -d /Volumes/T7/MillionSongSubset/ -o ./ -f track_id year artist_latitude artist_longitude
+
     """
     parser = argparse.ArgumentParser(description='ETL for the MillionSongDataset.')
     parser.add_argument('-d', '--data_path', type=str, dest='data_path', action='store', required=True,
                         help='path to the directory containing your (downloaded) dataset.')
-    parser.add_argument('-t', '--test', type=str, dest='test', action='store', required=True,
-                        help='path to the directory containing your (downloaded) dataset.')
+    parser.add_argument('-t', '--test', dest='test', action='store_true', required=False, default=False,
+                        help='flag for test (100-long dataframe).')
+    parser.add_argument('-f', '--fields', nargs='+', required=False, action='store', dest='fields',
+                        help='list of fields to include.')
+    parser.add_argument('-o', '--output', type=str, dest='output_path', action='store', required=False, default="",
+                        help='path to output file. Defaults to basedir.')
     return parser
 
 
@@ -31,7 +40,7 @@ def build_parser():
 # MAIN #
 ########
 
-def main(basedir, test):
+def main(basedir, output_path, test):
     # Initialize a list to collect file features.
     data_list = list()
 
@@ -42,7 +51,7 @@ def main(basedir, test):
     for root, dirs, files in os.walk(basedir):
         files = glob.glob(os.path.join(root, '*' + '.h5'))
         for f in files:
-            print(f"\r\033[A{cnt}")
+            print(f"\r\033[A{cnt}     {INCLUDE_FIELDS}")
             try:
                 data_list.append(pull_attrs_from_h5(f))
                 cnt += 1
@@ -59,9 +68,16 @@ def main(basedir, test):
     agg_df = pd.DataFrame(data_list)
 
     if test:
-        path = f'{basedir}MillionSongSubset_dataframe_test.pkl'
+        test_st = '_test'
     else:
-        path = f'{basedir}MillionSongSubset_dataframe.pkl'
+        test_st = ''
+
+    if INCLUDE_FIELDS:
+        field_st = '.' + '_'.join(INCLUDE_FIELDS)
+    else:
+        field_st = ''
+
+    path = f'{output_path}MillionSongSubset_dataframe{test_st}{field_st}.pkl'
     with open(path, 'wb') as f:
         pickle.dump(agg_df, f)
     print(path)
@@ -121,16 +137,28 @@ def process_group(grp, attrs):
 def process_ds(ds, attrs):
     if ds.dtype.names:
         for field in ds.dtype.names:
-            if field in IGNORE_FIELDS:
-                continue
-            attrs[field] = ds[field][0]
+            if INCLUDE_FIELDS \
+                and field in INCLUDE_FIELDS \
+                and field not in EXCLUDE_FIELDS:
+                attrs[field] = ds[field][0]
+            elif EXCLUDE_FIELDS \
+                and field not in EXCLUDE_FIELDS:
+                attrs[field] = ds[field][0]
     elif type(list(ds[()])) == h5._hl.dataset.Dataset:
         attrs = process_ds(list(ds[()]), attrs)
     else:
         vals = []
-        for ele in ds:
-            vals.append(ele)
-        attrs[ds.name.split("/")[-1]] = vals
+        if INCLUDE_FIELDS \
+            and ds.name.split("/")[-1] in INCLUDE_FIELDS \
+            and ds.name.split("/")[-1] not in EXCLUDE_FIELDS:
+            for ele in ds:
+                vals.append(ele)
+            attrs[ds.name.split("/")[-1]] = vals
+        elif EXCLUDE_FIELDS \
+            and ds.name.split("/")[-1] not in EXCLUDE_FIELDS:
+            for ele in ds:
+                vals.append(ele)
+            attrs[ds.name.split("/")[-1]] = vals
     return attrs
 
 
@@ -143,6 +171,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     data_path = args.data_path
-    test = False if args.test in ["False", "false"] else True
+    test = args.test
 
-    main(data_path, test)
+    if args.fields:
+        global INCLUDE_FIELDS
+        INCLUDE_FIELDS = args.fields
+
+    if args.output_path:
+        output_path = args.output_path
+    else:
+        output_path = data_path
+
+    main(data_path, output_path, test)
