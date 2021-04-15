@@ -42,10 +42,10 @@ class Metric:
         try:
             return pairwise.cosine_similarity(x, y)
         except Exception as e:
-            print("Formatting X, Y as numpy arrays...")
+            #print("Formatting X, Y as numpy arrays...")
             x = np.asarray(x).reshape(1, -1)
             y = np.asarray(y).reshape(1, -1)
-            return pairwise.cosine_similarity(x, y)
+            return 1 - pairwise.cosine_similarity(x, y)
 
     def dot_product(self, x, y):
         return np.dot(x, y)
