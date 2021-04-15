@@ -84,7 +84,7 @@ sample_matrix3 = [sample_vector3, sample_vector1, # square matrix for determinan
                   sample_vector4, sample_vector3,
                   sample_vector2, sample_vector4]
 
-metric = Metric()
-print("L2 norm:", metric.cosine_similarity(sample_vector1, sample_vector2))
-print("Pseduom:", metric.spectral_correlation_pseudometric(sample_matrix1, sample_matrix2))
+#metric = Metric()
+#print("L2 norm:", metric.cosine_similarity(sample_vector1, sample_vector2))
+#print("Pseduom:", metric.spectral_correlation_pseudometric(sample_matrix1, sample_matrix2))
 

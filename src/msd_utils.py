@@ -46,9 +46,10 @@ def vectorize_segments_pitches_distribution(pitches_vector):
 
     # Now, collapse the 2-D histogram into a 256-length feature vector
     return_vector = []
+    normalization_factor = len(pitches_vector) # normalize, since more entries -> higher values due to length
     for i in range(12):
         for j in range(32):
-            return_vector.append(tone_bins[i][j])
+            return_vector.append(tone_bins[i][j] / normalization_factor)
     return return_vector
 
 
