@@ -66,15 +66,25 @@ class Metric:
         m = 1 - (matrix_sum / (x2 * y2) )
         return m
 
+    def determinant(self, x):
+        """
+        For square matrixes, compute the determinant
+        Can use when we need to perform an nxn -> 1 data reduction
+        """
+        return np.linalg.det(np.array(x))
 
 sample_vector1 = [0, 0, 1, 2, 0.5, 0]
 sample_vector2 = [0, 1, 0, 2, 0.6, 0]
-sample_vector3 = [1, 1, 1, 1, 0.5, 0]
+sample_vector3 = [1.2, 1, 1, 1, 0.5, 0]
 sample_vector4 = [0, 1, 0, 1, 0, 1]
 
 sample_matrix1 = [sample_vector1, sample_vector1]
 sample_matrix2 = [sample_vector3, sample_vector4]
+sample_matrix3 = [sample_vector3, sample_vector1, # square matrix for determinant
+                  sample_vector4, sample_vector3,
+                  sample_vector2, sample_vector4]
 
 metric = Metric()
 print("L2 norm:", metric.cosine_similarity(sample_vector1, sample_vector2))
 print("Pseduom:", metric.spectral_correlation_pseudometric(sample_matrix1, sample_matrix2))
+
