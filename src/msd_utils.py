@@ -1,7 +1,9 @@
 # Creating a utils file for functions specific to the MSD
 import collections
+from itertools import combinations
 import numpy as np
 from scipy.stats import entropy  # new requirement; we should track these when we publish ;)
+from src import Metrics
 
 # Explanation: the pitches_segments field of the MSD tracks a numeric value [0, 1] for each of the 12 conventional
 # semitones (A->G#) over each segment. The result is an array (variable length) of arrays (length 12)
@@ -105,3 +107,71 @@ def vectorize_segments_pitches(pitches_vector):
 
     return_vector = pitch_distribution + pitch_entropy
     return return_vector
+
+
+
+### Some functions which aid in the analysis of segmenets_pitches, but which can probably be adapted for general use
+
+def retrieve_vectorized_data(subdf):
+    """
+    Take dataframe, vectorize the segments_pitches columnn, add the feature vector as a column in the dataframe
+    """
+    pitch_features = []
+    for index, row in subdf.iterrows():
+        row_feats = vectorize_segments_pitches(row["segments_pitches"])
+        pitch_features.append(row_feats)
+    subdf["pitch_features"] = pitch_features
+    return subdf
+
+
+def compute_metric_matrix(subdf, metric_function):
+    """
+    Take a dataframe and a metric function name; compute a matrix where each row (song) in the dataframe is compared
+    against each other row. Return the NxN symmetric matrix of values
+    """
+
+    mf = Metrics.Metric()  # metric factory
+    metric_function = getattr(subdf, metric_function)
+    metrics_df = []
+
+    # Compute a square matrix of scores (every song against every song)
+    for index1, row1 in subdf.iterrows():
+        metric_scores = []
+        for index2, row2 in subdf.iterrows():
+            score = metric_function(row1["pitch_features"], row2["pitch_features"])
+            metric_scores.append(score)
+        metrics_df.append(metric_scores)
+    return metrics_df
+
+
+def generate_set_of_sets_from_radius(metric_matrix, radius):
+    """
+    Given a matrix of metric values, group together datapoints whose metric value sits below some given threshold (radius).
+    Return a collection of those groups, as indicated by their indices in the metric matrix
+    """
+
+    elements = set()
+    for i in range(len(metric_matrix)):
+        ball_centered_around_i = set()
+        for j in range(len(metric_matrix)):
+            if metric_matrix[i][j] < radius:
+                ball_centered_around_i.add(j)
+        ball = tuple(sorted(ball_centered_around_i))
+        elements.add(ball)
+    return elements
+
+
+def generate_simplicial_complexes(set_of_sets):
+    """
+    Treat each set like it represents a simplicial complex, and generate inclusion power sets all the way down
+    (simplicial complexes are closed under interection; if (abc), then (ab), (ac), and (bc) must be in the set)
+    Capped off at max size = 3 to prevent computational overload
+    """
+    combs = set()
+    for simplicial_complex in set_of_sets:
+        print(simplicial_complex, "\n")
+        for i in range(1, 4):  # small size to keep computationally tractable
+            i_length_combos = combinations(simplicial_complex, i)
+            for combo in i_length_combos:
+                combs.add(tuple(sorted(combo)))
+    return combs
