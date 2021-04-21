@@ -14,6 +14,31 @@ import glob
 EXCLUDE_FIELDS = []
 #INCLUDE_FIELDS = []
 
+ALL_FIELDS = ['bars_confidence', 'bars_start', 'beats_confidence', 'beats_start',
+       'sections_confidence', 'sections_start', 'segments_confidence',
+       'segments_loudness_max', 'segments_loudness_max_time',
+       'segments_loudness_start', 'segments_pitches', 'segments_start',
+       'segments_timbre', 'analysis_sample_rate', 'audio_md5', 'danceability',
+       'duration', 'end_of_fade_in', 'energy', 'idx_bars_confidence',
+       'idx_bars_start', 'idx_beats_confidence', 'idx_beats_start',
+       'idx_sections_confidence', 'idx_sections_start',
+       'idx_segments_confidence', 'idx_segments_loudness_max',
+       'idx_segments_loudness_max_time', 'idx_segments_loudness_start',
+       'idx_segments_pitches', 'idx_segments_start', 'idx_segments_timbre',
+       'idx_tatums_confidence', 'idx_tatums_start', 'key', 'key_confidence',
+       'loudness', 'mode', 'mode_confidence', 'start_of_fade_out', 'tempo',
+       'time_signature', 'time_signature_confidence', 'track_id',
+       'tatums_confidence', 'tatums_start', 'artist_terms',
+       'artist_terms_freq', 'artist_terms_weight', 'similar_artists',
+       'analyzer_version', 'artist_7digitalid', 'artist_familiarity',
+       'artist_hotttnesss', 'artist_id', 'artist_latitude', 'artist_location',
+       'artist_longitude', 'artist_mbid', 'artist_name', 'artist_playmeid',
+       'genre', 'idx_artist_terms', 'idx_similar_artists', 'release',
+       'release_7digitalid', 'song_hotttnesss', 'song_id', 'title',
+       'track_7digitalid', 'artist_mbtags', 'artist_mbtags_count',
+       'idx_artist_mbtags', 'year']
+
+
 def build_parser():
     """
     Dropping this at the top for legibility (reading args)
@@ -175,7 +200,10 @@ if __name__ == '__main__':
 
     if args.fields:
         global INCLUDE_FIELDS
-        INCLUDE_FIELDS = args.fields
+        if 'all' in args.fields:
+            INCLUDE_FIELDS = ALL_FIELDS
+        else:
+            INCLUDE_FIELDS = args.fields
 
     if args.output_path:
         output_path = args.output_path
