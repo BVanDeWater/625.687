@@ -3,7 +3,7 @@ import collections
 from itertools import combinations
 import numpy as np
 from scipy.stats import entropy  # new requirement; we should track these when we publish ;)
-from src import Metrics
+import Metrics
 
 # Explanation: the pitches_segments field of the MSD tracks a numeric value [0, 1] for each of the 12 conventional
 # semitones (A->G#) over each segment. The result is an array (variable length) of arrays (length 12)
