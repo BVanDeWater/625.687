@@ -4,6 +4,9 @@ Metrics for use with an Abstract Simplicial Complex (housed in AbstractSimplicia
 '''
 import numpy as np
 from sklearn.metrics import pairwise
+from sklearn.neighbors import DistanceMetric
+
+from math import asin, sin, cos, sqrt, radians
 
 ##############
 # BASE CLASS #
@@ -72,6 +75,26 @@ class Metric:
         Can use when we need to perform an nxn -> 1 data reduction
         """
         return np.linalg.det(np.array(x))
+
+    def year_lat_lon(self, x, y):
+        haversine = DistanceMetric.get_metric("haversine")
+        #try:
+        x_year = x['year']
+        x_lat  = radians(x['artist_latitude'])
+        x_lon  = radians(x['artist_longitude'])
+        y_year = y['year']
+        y_lat  = radians(y['artist_latitude'])
+        y_lon  = radians(y['artist_longitude'])
+        #except:
+        #    raise IOError("Problem parsing features.")
+        #    return None
+
+        rad = 6367.44
+        haversine = 2*rad*asin(sqrt(sin((y_lat - x_lat)/2)**2 + cos(x_lat)*cos(y_lat)*sin((y_lon - x_lon)/2)**2))
+        norm_year = (abs(x_year - y_year))/((2010 - 1926)*2)
+
+        dist = (1/(20003*2)) * haversine + norm_year
+        return dist
 
 sample_vector1 = [0, 0, 1, 2, 0.5, 0]
 sample_vector2 = [0, 1, 0, 2, 0.6, 0]
