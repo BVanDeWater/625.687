@@ -38,7 +38,7 @@ class Metric:
     def L_inf_norm(self, x, y, radius=None):
         linf = []
         for i in range(len(x)):
-            linf += abs(x[i] - y[i])
+            linf.append(abs(x[i] - y[i]))
         return max(linf)
 
     def cosine_similarity(self, x, y):
@@ -48,7 +48,7 @@ class Metric:
             #print("Formatting X, Y as numpy arrays...")
             x = np.asarray(x).reshape(1, -1)
             y = np.asarray(y).reshape(1, -1)
-            return 1 - pairwise.cosine_similarity(x, y)
+            return 1 - pairwise.cosine_similarity(x, y)[0][0]
 
     def dot_product(self, x, y):
         return np.dot(x, y)

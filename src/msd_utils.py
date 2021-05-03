@@ -131,7 +131,7 @@ def compute_metric_matrix(subdf, metric_function):
     """
 
     mf = Metrics.Metric()  # metric factory
-    metric_function = getattr(subdf, metric_function)
+    metric_function = getattr(mf, metric_function)
     metrics_df = []
 
     # Compute a square matrix of scores (every song against every song)
