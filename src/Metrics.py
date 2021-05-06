@@ -96,6 +96,11 @@ class Metric:
         dist = (1/(20003*2)) * haversine + norm_year
         return dist
 
+    def similar_artists_jaccard(self, x, y):
+        commons = {term for term in x['similar_artists'] if term in y['similar_artists']}
+        m = 1 - len(commons)/len(x['similar_artists'])
+        return m
+
 sample_vector1 = [0, 0, 1, 2, 0.5, 0]
 sample_vector2 = [0, 1, 0, 2, 0.6, 0]
 sample_vector3 = [1.2, 1, 1, 1, 0.5, 0]
