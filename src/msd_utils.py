@@ -124,7 +124,7 @@ def retrieve_vectorized_data(subdf):
     return subdf
 
 
-def compute_metric_matrix(subdf, metric_function):
+def compute_metric_matrix(subdf, field, metric_function):
     """
     Take a dataframe and a metric function name; compute a matrix where each row (song) in the dataframe is compared
     against each other row. Return the NxN symmetric matrix of values
@@ -138,7 +138,7 @@ def compute_metric_matrix(subdf, metric_function):
     for index1, row1 in subdf.iterrows():
         metric_scores = []
         for index2, row2 in subdf.iterrows():
-            score = metric_function(row1["pitch_features"], row2["pitch_features"])
+            score = metric_function(row1[field], row2[field])
             metric_scores.append(score)
         metrics_df.append(metric_scores)
     return metrics_df
